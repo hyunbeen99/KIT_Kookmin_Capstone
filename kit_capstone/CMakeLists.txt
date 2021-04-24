@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(kit_Capstone)
+project(kit_capstone)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -11,6 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  obstacle_detector
+  geometry_msgs
+  ackermann_msgs
 )
 
 
@@ -39,6 +42,8 @@ find_package(catkin REQUIRED COMPONENTS
 generate_messages(
    DEPENDENCIES
    std_msgs
+   geometry_msgs
+   ackermann_msgs
  )
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder

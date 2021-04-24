@@ -79,8 +79,8 @@ bool ObstacleExtractor::updateParams(std_srvs::Empty::Request &req, std_srvs::Em
   bool prev_active = p_active_;
 
   nh_local_.param<bool>("active", p_active_, true);
-  nh_local_.param<bool>("use_scan", p_use_scan_, false);
-  nh_local_.param<bool>("use_pcl", p_use_pcl_, true);
+  nh_local_.param<bool>("use_scan", p_use_scan_, true);
+  nh_local_.param<bool>("use_pcl", p_use_pcl_, false);
 
   nh_local_.param<bool>("use_split_and_merge", p_use_split_and_merge_, true);
   nh_local_.param<bool>("circles_from_visibles", p_circles_from_visibles_, true);
@@ -102,7 +102,7 @@ bool ObstacleExtractor::updateParams(std_srvs::Empty::Request &req, std_srvs::Em
   nh_local_.param<double>("min_y_limit", p_min_y_limit_, -10.0);
   nh_local_.param<double>("max_y_limit", p_max_y_limit_,  10.0);
 
-  nh_local_.param<string>("frame_id", p_frame_id_, "map");
+  nh_local_.param<string>("frame_id", p_frame_id_, "laser");
 
   if (p_active_ != prev_active) {
     if (p_active_) {
