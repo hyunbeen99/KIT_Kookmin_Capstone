@@ -5,7 +5,13 @@
 	  <remap from="scan_filtered" to="narrow_path_scan_filtered"/>
   </node> -->
 
-  <node name="kit_capstone" pkg="kit_capstone" type="kit_capstone.py" output="screen">
+  <node name="kit_capstone" pkg="kit_capstone" type="kit_capstone.py" output="screen">	 
+    <param name="kp"               value="0.25"/>
+    <param name="ki"               value="0.0005"/>
+    <param name="kd"               value="0.5"/>
+    <param name="dotest"               value="true"/>
+    <param name="padding_angle"               value="10.0"/>
+    <param name="padding_velocity"               value="2"/>
   </node>
 
   <node name="kit_capstone_obstacle_extractor" pkg="obstacle_detector" type="obstacle_extractor_node">
