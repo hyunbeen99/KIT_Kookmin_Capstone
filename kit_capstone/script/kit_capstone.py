@@ -28,11 +28,11 @@ class PID:
 class CapstoneMainDrive:
 	def __init__(self):
                 # Parameter
-                kp = rospy.get_param("/kp", 0.0)
-                ki = rospy.get_param("/ki", 0.0)
-                kd = rospy.get_param("/kd", 0.0)
+                kp = rospy.get_param("/kp", 0.2)
+                ki = rospy.get_param("/ki", 0.005)
+                kd = rospy.get_param("/kd", 0.05)
 
-                self.dotest = rospy.get_param("/dotest", 0)
+                self.dotest = rospy.get_param("/dotest", True)
                 self.padding_angle = rospy.get_param("/padding_angle", 10)
                 self.padding_velocity = rospy.get_param("/padding_velocity", 2)
 
@@ -43,7 +43,9 @@ class CapstoneMainDrive:
 
 		self.lidar_sub = rospy.Subscriber('raw_obstacles', Obstacles, self.obstacles_callback) 
 		#self.imu_sub = rospy.Subscriber('kit_capstone_imu', , ) 
-		#self.steer_pub 
+
+                #publisher is not fixed
+		#self.steer_pub = rospy.Publisher('controller',AckermannDriveStamped,
 
 
 	def obstacles_callback(self,data):
@@ -78,8 +80,10 @@ class CapstoneMainDrive:
                 velocity = self.calc_velocity(angle)
 
                 if self.dotest:
-                    rospy.loginfo("angle = " , angle)
-                    rospy.loginfo("velocity= " , velocity)
+                    rospy.loginfo("angle = " + str(angle))
+                    rospy.loginfo("velocity= " + str(velocity))
+
+                #TODO: publisher
 
 
 
