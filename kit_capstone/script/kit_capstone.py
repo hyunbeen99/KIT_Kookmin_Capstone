@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+import math
 
 from obstacle_detector.msg import Obstacles, SegmentObstacle
 from geometry_msgs.msg import Point
@@ -17,9 +18,9 @@ class PID:
         self.d_error = 0.0
 
     def totalError(self, cte):
-        self.d_error = cte - self.p_errer
+        self.d_error = cte - self.p_error
         self.p_error = cte
-        self.i_error = += cte
+        self.i_error += cte
 
         return self.kp * self.p_error + self.ki * self.i_error + self.kd * self.d_error
 
@@ -32,8 +33,8 @@ class CapstoneMainDrive:
                 kd = rospy.get_param("/kd", 0.0)
 
                 self.dotest = rospy.get_param("/dotest", 0)
-                self.padding_angle = rospy.get_param("/padding_angle")
-                self.padding_velocity = rospy.get_param("/padding_velocity")
+                self.padding_angle = rospy.get_param("/padding_angle", 10)
+                self.padding_velocity = rospy.get_param("/padding_velocity", 2)
 
                 self.pid = PID(kp, ki, kd)
 
@@ -61,16 +62,18 @@ class CapstoneMainDrive:
                     way_point.y += obs.last_point.y
 
                 way_point.x /= len(data.segments)
-                #way_point.y /= len(data.segments)
+                way_point.y /= len(data.segments)
 
-                return way_point.x, way_point.y
+                #return way_point.x, way_point.y
+                return math.atan(way_point.y/way_point.x)
 
 
         def calc_velocity(self, angle):
-                return (((max_angle + self.padding_angle) - angle) ** 2) * self.padding_velocity
+                #max_angle is 20
+                return (((20 + self.padding_angle) - angle) ** 2) * self.padding_velocity
 
 
-         def main_pathing(self, data):
+        def main_pathing(self, data):
                 angle = self.pid.totalError(self.waypoint(data))
                 velocity = self.calc_velocity(angle)
 

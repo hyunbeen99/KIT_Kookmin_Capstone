@@ -5,6 +5,7 @@
 	  <remap from="scan_filtered" to="narrow_path_scan_filtered"/>
   </node> -->
 
+
   <node name="kit_capstone" pkg="kit_capstone" type="kit_capstone.py" output="screen">	 
     <param name="kp"               value="0.25"/>
     <param name="ki"               value="0.0005"/>
