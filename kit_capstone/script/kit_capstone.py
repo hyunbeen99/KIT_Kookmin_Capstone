@@ -3,9 +3,9 @@
 import rospy
 import math
 
+#from kit_capstone.msg import Drive
 from obstacle_detector.msg import Obstacles, SegmentObstacle
-from geometry_msgs.msg import Point
-from ackermann_msgs.msg import AckermannDriveStamped
+from geometry_msgs.msg import Point, Twist
 
 class PID:
     def __init__(self, kp, ki, kd):
@@ -40,13 +40,9 @@ class CapstoneMainDrive:
 
                 # init
 		rospy.init_node('kit_capstone', anonymous=True)
-
 		self.lidar_sub = rospy.Subscriber('raw_obstacles', Obstacles, self.obstacles_callback) 
+		self.steer_pub = rospy.Publisher('controller', Twist, queue_size = 10)
 		#self.imu_sub = rospy.Subscriber('kit_capstone_imu', , ) 
-
-                #publisher is not fixed
-		#self.steer_pub = rospy.Publisher('controller',AckermannDriveStamped,
-
 
 	def obstacles_callback(self,data):
 		rospy.loginfo('callback_start')
@@ -84,6 +80,11 @@ class CapstoneMainDrive:
                     rospy.loginfo("velocity= " + str(velocity))
 
                 #TODO: publisher
+                drive_data = Twist()
+                drive_data.angular.z = angle
+                drive_data.linear.x = velocity
+
+                self.steer_pub.publish(drive_data)
 
 
 
