@@ -5,7 +5,8 @@ import math
 
 #from kit_capstone.msg import Drive
 from obstacle_detector.msg import Obstacles, SegmentObstacle
-from geometry_msgs.msg import Point, Twist
+from geometry_msgs.msg import Point, Twist, Pose
+from visualization_msgs.msg import MarkerArray, Marker
 
 class PID:
     def __init__(self, kp, ki, kd):
@@ -38,10 +39,14 @@ class CapstoneMainDrive:
 
                 self.pid = PID(kp, ki, kd)
 
+                self.marker_idx = 0
+                self.marker_array_msg = MarkerArray()
+
                 # init
 		rospy.init_node('kit_capstone', anonymous=True)
 		self.lidar_sub = rospy.Subscriber('raw_obstacles', Obstacles, self.obstacles_callback) 
 		self.steer_pub = rospy.Publisher('controller', Twist, queue_size = 10)
+		self.marker_pub = rospy.Publisher('marker', Marker, queue_size = 10)
 		#self.imu_sub = rospy.Subscriber('kit_capstone_imu', , ) 
 
 	def obstacles_callback(self,data):
@@ -61,6 +66,8 @@ class CapstoneMainDrive:
 
                 way_point.x /= len(data.segments)
                 way_point.y /= len(data.segments)
+                
+                self.init_markers(way_point.x, way_point.y)
 
                 #return way_point.x, way_point.y
                 return math.atan(way_point.y/way_point.x)
@@ -72,8 +79,10 @@ class CapstoneMainDrive:
 
 
         def main_pathing(self, data):
-                angle = self.pid.totalError(self.waypoint(data))
-                velocity = self.calc_velocity(angle)
+                #angle = self.pid.totalError(self.waypoint(data))
+                #velocity = self.calc_velocity(angle)
+                angle = (self.waypoint(data))*180/math.pi
+                velocity = 1.1
 
                 if self.dotest:
                     rospy.loginfo("angle = " + str(angle))
@@ -86,6 +95,29 @@ class CapstoneMainDrive:
 
                 self.steer_pub.publish(drive_data)
 
+        def init_markers(self,x,y):
+
+                marker = Marker()
+                marker.header.frame_id = 'laser'
+                marker.id = self.marker_idx
+                marker.type = 2
+                marker.action = 2
+                marker.pose = Pose()
+                marker.pose.position.x = x
+                marker.pose.position.y = y
+                marker.pose.position.z = 0.0
+
+                marker.color.r = 1.0
+                marker.color.g = 0.0
+                marker.color.b = 0.0
+                marker.color.a = 1.0
+                marker.scale.x = 1.0
+                marker.scale.y = 1.0
+                marker.scale.z = 1.0
+                marker.frame_locked = False
+                marker.ns = "Goal-%u"
+
+                self.marker_pub.publish(marker)
 
 
 if __name__ == '__main__':

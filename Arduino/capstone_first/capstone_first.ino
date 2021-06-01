@@ -33,25 +33,21 @@ void servo_cb(const geometry_msgs::Twist& cmd_msg) {
   // PWM
   // velocity_servo.writeMicroseconds(1515);
 
-  if (steering_angle < -20){
-    output = 1220;
-  }else if (steering_angle < -10){
-    output = 1320;
-  }else if (steering_angle > 20){
-    output = 1680;
-  }else if (steering_angle > 10){
-    output = 1580;
+  if (steering_angle < -5){
+    output = 1400;
+  }else if (steering_angle > 5){
+    output = 1730;
   }else {
-    output = 1450;
+    output = 1500;
   }
 
   // write 1250 ~ 1750 (middle = 1450)
   steer_servo.writeMicroseconds(output);
   
   // -5 < steer < 5
-  if (output != 1450){
+  if (velocity >= 1){
     velocity_servo.writeMicroseconds(1520);
-  }else if (output == 1450){
+  }else if (velocity == 0){
     velocity_servo.writeMicroseconds(1570);
   }
 }

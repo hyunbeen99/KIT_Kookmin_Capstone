@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   obstacle_detector
   geometry_msgs
   ackermann_msgs
+  visualization_msgs
   message_generation
 )
 
@@ -45,6 +46,7 @@ generate_messages(
    std_msgs
    geometry_msgs
    ackermann_msgs
+   visualization_msgs
  )
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
