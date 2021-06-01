@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <launch>
-  <!--<node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="narrow_path_laser_filter">
-	  <rosparam command="load" file="$(find narrow_path)/launch/box_filter.yaml" />
-	  <remap from="scan_filtered" to="narrow_path_scan_filtered"/>
-  </node> -->
+  <node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="kit_capstone_laser_filter">
+	  <rosparam command="load" file="$(find kit_capstone)/launch/box_filter.yaml" />
+	  <!--remap from="scan_filtered" to="raw_obstacles"/-->
+	  <remap from="scan_filtered" to="kit_capstone_scan_filtered"/>
+  </node>
 
 
   <node name="kit_capstone" pkg="kit_capstone" type="kit_capstone.py" output="screen">	 
@@ -16,6 +17,7 @@
   </node>
 
   <node name="kit_capstone_obstacle_extractor" pkg="obstacle_detector" type="obstacle_extractor_node">
+	  <remap from="scan" to="kit_capstone_scan_filtered"/>
     <param name="active"               value="true"/>
     <param name="use_scan"             value="true"/>
     <param name="use_pcl"              value="false"/>
