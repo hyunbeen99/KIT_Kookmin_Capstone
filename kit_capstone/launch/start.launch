@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find rplidar_ros)/launch/rplidar.launch" />
+  <include file="$(find kit_capstone)/launch/kit_capstone.launch" />
+
+  <node pkg="rosserial_python" type="serial_node.py" output="screen" name="Arduino" args="/dev/ttyUSB0" />
+
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find kit_capstone)/rviz/kit_capstone.rviz" />
+</launch>

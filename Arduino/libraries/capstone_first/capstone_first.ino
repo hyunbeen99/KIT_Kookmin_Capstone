@@ -22,7 +22,8 @@ ros::NodeHandle nh;
 Servo steer_servo;
 Servo velocity_servo;
 
-int output;
+int output = 1460;
+int weight = 1;
 
 
 void servo_cb(const geometry_msgs::Twist& cmd_msg) {
@@ -30,30 +31,19 @@ void servo_cb(const geometry_msgs::Twist& cmd_msg) {
   float steering_angle = cmd_msg.angular.z;
   float velocity = cmd_msg.linear.x;
 
-  // PWM
-  // velocity_servo.writeMicroseconds(1515);
+  output = 1460 + int(10 * steering_angle);
 
-  if (steering_angle < -20){
-    output = 1220;
-  }else if (steering_angle < -10){
-    output = 1320;
-  }else if (steering_angle > 20){
-    output = 1680;
-  }else if (steering_angle > 10){
-    output = 1580;
-  }else {
-    output = 1450;
+  // max angle == 23 degree
+  if (output < 1200){
+    output = 1200;
+  }else if (output > 1720){
+    output = 1720;
   }
 
-  // write 1250 ~ 1750 (middle = 1450)
   steer_servo.writeMicroseconds(output);
-  
-  // -5 < steer < 5
-  if (output != 1450){
-    velocity_servo.writeMicroseconds(1520);
-  }else if (output == 1450){
-    velocity_servo.writeMicroseconds(1570);
-  }
+
+  // velocity_servo must be more than 1520
+  velocity_servo.writeMicroseconds(1550);
 }
 
 ros::Subscriber<geometry_msgs::Twist> sub_servo("controller", servo_cb);
@@ -62,12 +52,12 @@ ros::Subscriber<geometry_msgs::Twist> sub_servo("controller", servo_cb);
 void setup() {
   nh.initNode();
   nh.subscribe(sub_servo);
-  steer_servo.attach(9);
-  velocity_servo.attach(10);
+  steer_servo.attach(10);
+  velocity_servo.attach(9);
 }
 
 void loop() {
   nh.spinOnce();
 
-  delay(1);
+  delay(5);
 }

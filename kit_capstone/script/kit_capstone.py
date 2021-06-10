@@ -40,13 +40,14 @@ class CapstoneMainDrive:
                 self.pid = PID(kp, ki, kd)
 
                 self.marker_idx = 0
-                self.marker_array_msg = MarkerArray()
+                self.markerArray = MarkerArray()
+		self.count = 0
 
                 # init
 		rospy.init_node('kit_capstone', anonymous=True)
 		self.lidar_sub = rospy.Subscriber('raw_obstacles', Obstacles, self.obstacles_callback) 
 		self.steer_pub = rospy.Publisher('controller', Twist, queue_size = 10)
-		self.marker_pub = rospy.Publisher('marker', Marker, queue_size = 10)
+		self.marker_pub = rospy.Publisher('marker', MarkerArray, queue_size = 10)
 		#self.imu_sub = rospy.Subscriber('kit_capstone_imu', , ) 
 
 	def obstacles_callback(self,data):
@@ -99,25 +100,34 @@ class CapstoneMainDrive:
 
                 marker = Marker()
                 marker.header.frame_id = 'laser'
-                marker.id = self.marker_idx
-                marker.type = 2
-                marker.action = 2
-                marker.pose = Pose()
+		marker.action = marker.ADD
+                marker.type = marker.SPHERE
+		marker.pose.orientation.w = 1.0
                 marker.pose.position.x = x
                 marker.pose.position.y = y
-                marker.pose.position.z = 0.0
+                marker.pose.position.z = 0
 
                 marker.color.r = 1.0
-                marker.color.g = 0.0
+                marker.color.g = 1.0
                 marker.color.b = 0.0
                 marker.color.a = 1.0
-                marker.scale.x = 1.0
-                marker.scale.y = 1.0
-                marker.scale.z = 1.0
-                marker.frame_locked = False
-                marker.ns = "Goal-%u"
+                marker.scale.x = 0.1
+                marker.scale.y = 0.1
+                marker.scale.z = 0.1
 
-                self.marker_pub.publish(marker)
+		if (self.count > 3):
+			self.markerArray.markers.pop(0)
+
+		self.markerArray.markers.append(marker)
+
+		id = 0
+		for m in self.markerArray.markers:
+			m.id = id
+			id += 1
+
+		self.count += 1
+
+                self.marker_pub.publish(self.markerArray)
 
 
 if __name__ == '__main__':

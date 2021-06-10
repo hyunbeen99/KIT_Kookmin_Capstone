@@ -3,22 +3,31 @@ scan_filter_chain:
   type: laser_filters/LaserScanBoxFilter
   params:
     box_frame: laser 
-    max_x: 1000.0
+    max_x: 100.0
     max_y: -100.0 
     max_z: 0.3
-    min_x: 3.0
-    min_y: -8.0
+    min_x: -100.0
+    min_y: -1.8
     min_z: -0.28
-
 - name: right_box_filter
   type: laser_filters/LaserScanBoxFilter
   params:
     box_frame: laser 
-    max_x: 1000.0
+    max_x: 100.0
     max_y: 100.0
     max_z: 0.3
-    min_x: 3.0
-    min_y: 8.0
+    min_x: -100.0
+    min_y: 1.8
+    min_z: -0.28
+- name: front_box_filter
+  type: laser_filters/LaserScanBoxFilter
+  params:
+    box_frame: laser 
+    max_x: 100.0
+    max_y: 100.0
+    max_z: 0.3
+    min_x: 1.9
+    min_y: -100.0
     min_z: -0.28
 - name: inner_box_filter
   type: laser_filters/LaserScanBoxFilter
@@ -35,10 +44,10 @@ scan_filter_chain:
   params:
     box_frame: laser 
     max_x: -0.007
-    max_y: 8.0
+    max_y: 100.0
     max_z: 0.3
     min_x: -100.0
-    min_y: -8.0
+    min_y: -100.0
     min_z: -0.28
 - name: range_filter
   type: laser_filters/LaserScanRangeFilter
