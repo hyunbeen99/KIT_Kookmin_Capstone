@@ -8,36 +8,10 @@ from obstacle_detector.msg import Obstacles, SegmentObstacle
 from geometry_msgs.msg import Point, Twist, Pose
 from visualization_msgs.msg import MarkerArray, Marker
 
-class PID:
-    def __init__(self, kp, ki, kd):
-        self.kp = kp
-        self.ki = ki
-        self.kd = kd
-
-        self.p_error = 0.0
-        self.i_error = 0.0
-        self.d_error = 0.0
-
-    def totalError(self, cte):
-        self.d_error = cte - self.p_error
-        self.p_error = cte
-        self.i_error += cte
-
-        return self.kp * self.p_error + self.ki * self.i_error + self.kd * self.d_error
-
 
 class CapstoneMainDrive:
 	def __init__(self):
-                # Parameter
-                kp = rospy.get_param("/kp", 0.2)
-                ki = rospy.get_param("/ki", 0.005)
-                kd = rospy.get_param("/kd", 0.05)
-
                 self.dotest = rospy.get_param("/dotest", True)
-                self.padding_angle = rospy.get_param("/padding_angle", 10)
-                self.padding_velocity = rospy.get_param("/padding_velocity", 2)
-
-                self.pid = PID(kp, ki, kd)
 
                 self.marker_idx = 0
                 self.markerArray = MarkerArray()
@@ -48,13 +22,11 @@ class CapstoneMainDrive:
 		self.lidar_sub = rospy.Subscriber('raw_obstacles', Obstacles, self.obstacles_callback) 
 		self.steer_pub = rospy.Publisher('controller', Twist, queue_size = 10)
 		self.marker_pub = rospy.Publisher('marker', MarkerArray, queue_size = 10)
-		#self.imu_sub = rospy.Subscriber('kit_capstone_imu', , ) 
 
 	def obstacles_callback(self,data):
 		rospy.loginfo('callback_start')
 		self.main_pathing(data)
 		
-
 	def waypoint(self, data):
                 way_point = Point()
 
@@ -65,8 +37,8 @@ class CapstoneMainDrive:
                     way_point.y += obs.first_point.y
                     way_point.y += obs.last_point.y
 
-                way_point.x /= len(data.segments)
-                way_point.y /= len(data.segments)
+                way_point.x = way_point.x / (len(data.segments) * 2)
+                way_point.y = way_point.y / (len(data.segments) * 2)
                 
                 self.init_markers(way_point.x, way_point.y)
 
@@ -74,30 +46,32 @@ class CapstoneMainDrive:
                 return math.atan(way_point.y/way_point.x)
 
 
+	def calc_angle(self, data):
+		return self.waypoint(data) * 180 / math.pi
+
+
         def calc_velocity(self, angle):
-                #max_angle is 20
-                return (((20 + self.padding_angle) - angle) ** 2) * self.padding_velocity
+
+                if (abs(angle) > 8):
+		    return 1
+		else:
+		    return 2
 
 
         def main_pathing(self, data):
-                #angle = self.pid.totalError(self.waypoint(data))
-                #velocity = self.calc_velocity(angle)
-                angle = (self.waypoint(data))*180/math.pi
-                velocity = 1.1
+                drive_data = Twist()
 
                 if self.dotest:
-                    rospy.loginfo("angle = " + str(angle))
-                    rospy.loginfo("velocity= " + str(velocity))
+		    drive_data.angular.z = self.calc_angle(data)
+                    drive_data.linear.x = self.calc_velocity(drive_data.angular.z)
 
-                #TODO: publisher
-                drive_data = Twist()
-                drive_data.angular.z = angle
-                drive_data.linear.x = velocity
+                    rospy.loginfo("angle = " + str(drive_data.angular.z))
+                    rospy.loginfo("velocity= " + str(drive_data.linear.x))
 
-                self.steer_pub.publish(drive_data)
+                    self.steer_pub.publish(drive_data)
+
 
         def init_markers(self,x,y):
-
                 marker = Marker()
                 marker.header.frame_id = 'laser'
 		marker.action = marker.ADD
@@ -115,12 +89,13 @@ class CapstoneMainDrive:
                 marker.scale.y = 0.1
                 marker.scale.z = 0.1
 
-		if (self.count > 3):
+		if (self.count > 0):
 			self.markerArray.markers.pop(0)
 
 		self.markerArray.markers.append(marker)
 
 		id = 0
+
 		for m in self.markerArray.markers:
 			m.id = id
 			id += 1

@@ -22,7 +22,8 @@ ros::NodeHandle nh;
 Servo steer_servo;
 Servo velocity_servo;
 
-int output = 1460;
+int output_steer = 1460;
+int output_vel = 1560;
 int weight = 1;
 
 
@@ -31,19 +32,28 @@ void servo_cb(const geometry_msgs::Twist& cmd_msg) {
   float steering_angle = cmd_msg.angular.z;
   float velocity = cmd_msg.linear.x;
 
-  output = 1460 + int(10 * steering_angle);
+  output_steer = 1460 + int(10 * steering_angle);
 
   // max angle == 23 degree
-  if (output < 1200){
-    output = 1200;
-  }else if (output > 1720){
-    output = 1720;
+  if (output_steer < 1200){
+    output_steer = 1200;
+  }else if (output_steer > 1720){
+    output_steer = 1720;
   }
 
-  steer_servo.writeMicroseconds(output);
+  steer_servo.writeMicroseconds(output_steer);
 
   // velocity_servo must be more than 1520
-  velocity_servo.writeMicroseconds(1550);
+  if (int(velocity) == 0){
+    output_vel = 1510;
+  }else if (int(velocity) == 1){
+    output_vel = 1530;
+  }else if (int(velocity) == 2){
+    output_vel = 1550;
+  }
+  
+  velocity_servo.writeMicroseconds(output_vel);
+  
 }
 
 ros::Subscriber<geometry_msgs::Twist> sub_servo("controller", servo_cb);

@@ -8,12 +8,7 @@
 
 
   <node name="kit_capstone" pkg="kit_capstone" type="kit_capstone.py" output="screen">	 
-    <param name="kp"               value="0.25"/>
-    <param name="ki"               value="0.0005"/>
-    <param name="kd"               value="0.5"/>
     <param name="dotest"               value="true"/>
-    <param name="padding_angle"               value="10.0"/>
-    <param name="padding_velocity"               value="2"/>
   </node>
 
   <node name="kit_capstone_obstacle_extractor" pkg="obstacle_detector" type="obstacle_extractor_node">
@@ -32,7 +27,7 @@
     <param name="max_group_distance"   value="0.1"/>
     <param name="distance_proportion"  value="0.00628"/>
     <param name="max_split_distance"   value="0.2"/>
-    <param name="max_merge_separation" value="1.5"/>
+    <param name="max_merge_separation" value="0.5"/>
     <param name="max_merge_spread"     value="0.2"/>
     <param name="max_circle_radius"    value="0.1"/>
     <param name="radius_enlargement"   value="0.3"/>
